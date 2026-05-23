@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
         enum: ['student', 'staff', 'admin'],
         default: 'student'
     },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

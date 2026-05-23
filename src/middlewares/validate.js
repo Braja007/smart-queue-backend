@@ -20,5 +20,14 @@ const signupValidation = [
         .isIn(['student', 'staff', 'admin']).withMessage('Role must be student, staff, or admin'),
 ];
 
+const loginValidation = [
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Please provide a valid email'),
 
-module.exports = { signupValidation };
+  body('password')
+    .notEmpty().withMessage('Password is required'),
+];
+
+module.exports = { signupValidation, loginValidation };
