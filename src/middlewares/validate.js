@@ -21,13 +21,38 @@ const signupValidation = [
 ];
 
 const loginValidation = [
-  body('email')
-    .trim()
-    .notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Please provide a valid email'),
+    body('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Please provide a valid email'),
 
-  body('password')
-    .notEmpty().withMessage('Password is required'),
+    body('password')
+        .notEmpty().withMessage('Password is required'),
 ];
 
-module.exports = { signupValidation, loginValidation };
+const serviceValidation = [
+    body('name')
+        .trim()
+        .notEmpty().withMessage('Service name is required')
+        .isLength({ max: 100 }).withMessage('Name cannot exceed 100 characters'),
+
+    body('prefix')
+        .trim()
+        .notEmpty().withMessage('Prefix is required')
+        .isLength({ min: 1, max: 3 }).withMessage('Prefix must be 1 to 3 characters')
+        .isAlpha().withMessage('Prefix must contain only letters'),
+
+    body('dailyLimit')
+        .notEmpty().withMessage('Daily limit is required')
+        .isInt({ min: 1 }).withMessage('Daily limit must be a positive number'),
+
+    body('avgProcessTime')
+        .notEmpty().withMessage('Average process time is required')
+        .isInt({ min: 1 }).withMessage('Process time must be at least 1 minute'),
+
+    body('description')
+        .optional()
+        .isLength({ max: 250 }).withMessage('Description cannot exceed 250 characters'),
+];
+
+module.exports = { signupValidation, loginValidation, serviceValidation };
