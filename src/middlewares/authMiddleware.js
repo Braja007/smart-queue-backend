@@ -41,4 +41,18 @@ const verifyToken = async (req, res, next) => {
     }
 };
 
-module.exports = { verifyToken };
+const authorizeRoles = (...allowedRoles) => {
+    return (req, res, next) => {
+        if(!req.user) {
+            return sendError(res, 401, 'Authentication required');
+        }
+        if(!allowedRoles.includes(req.user.role)) {
+            return sendError(
+                res, 403, `Access denied. Only ${allowedRoles.join(' or ')} can perform this action`,
+            );
+        }
+        next();
+    };
+};
+
+module.exports = { verifyToken, authorizeRoles };
