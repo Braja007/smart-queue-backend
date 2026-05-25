@@ -54,6 +54,79 @@ const getAllServices = async (req, res) => {
     }
 };
 
+const updateService = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return sendError(res, 400, 'Validation failed', errors.array());
+    }
+
+    try {
+        const service = await Service.findById(req.params.id);
+        if (!service) {
+            return sendError(res, 404, 'Service not found');
+        }
+
+        if (req.body.prefix) {
+            req.body.prefix = req.body.prefix.toUpperCase();
+
+            const conflict = await Service.findOne({
+                prefix: req.body.prefix,
+                _id: { $ne: req.params.id },
+            });
+
+            if (conflict) {
+                return sendError(res, 409, 'Another service already uses this prefix');
+            }
+        }
+
+        if (req.body.name) {
+            const conflict = await Service.findOne({
+                name: req.body.name,
+                _id: { $ne: req.params.id },
+            });
+
+            if (conflict) {
+                return sendError(res, 409, 'Another service already uses this name');
+            }
+        }
+
+        const updated = await Service.findByIdAndUpdate(
+            req.params.id,
+            { $set: req.body },
+            { returnDocument: 'after', runValidators: true }
+        );
+
+        return sendSuccess(res, 200, 'Service updated successfully', {
+            service: updated,
+        });
+    } catch (error) {
+        console.error('Update service error:', error.message);
+        return sendError(res, 500, 'Server error while updating service');
+    }
+};
+
+const deleteService = async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.id);
+        if (!service) {
+            return sendError(res, 404, 'Service not found');
+        }
+
+        await Service.findByIdAndDelete(req.params.id);
+
+        return sendSuccess(res, 200, 'Service deleted successfully', {
+            deletedService: {
+                id: service._id,
+                name: service.name,
+                prefix: service.prefix,
+            },
+        });
+    } catch (error) {
+        console.error('Delete service error:', error.message);
+        return sendError(res, 500, 'Server error while deleting service');
+    }
+};
+
 const getServiceById = async (req, res) => {
     try {
         const service = await Service.findById(req.params.id);
@@ -69,4 +142,4 @@ const getServiceById = async (req, res) => {
     }
 };
 
-module.exports = { createService, getAllServices, getServiceById };
+module.exports = { createService, getAllServices, getServiceById, updateService, deleteService };

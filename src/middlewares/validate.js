@@ -55,4 +55,33 @@ const serviceValidation = [
         .isLength({ max: 250 }).withMessage('Description cannot exceed 250 characters'),
 ];
 
-module.exports = { signupValidation, loginValidation, serviceValidation };
+const updateServiceValidation = [
+    body('name')
+        .optional()
+        .trim()
+        .isLength({ max: 100 }).withMessage('Name cannot exceed 100 characters'),
+
+    body('prefix')
+        .optional()
+        .trim()
+        .isLength({ min: 1, max: 3 }).withMessage('Prefix must be 1 to 3 characters')
+        .isAlpha().withMessage('Prefix must contain only letters'),
+
+    body('dailyLimit')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Daily limit must be a positive number'),
+
+    body('avgProcessTime')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Process time must be at least 1 minute'),
+
+    body('isActive')
+        .optional()
+        .isBoolean().withMessage('isActive must be true or false'),
+
+    body('description')
+        .optional()
+        .isLength({ max: 250 }).withMessage('Description cannot exceed 250 characters'),
+];
+
+module.exports = { signupValidation, loginValidation, serviceValidation, updateServiceValidation };
