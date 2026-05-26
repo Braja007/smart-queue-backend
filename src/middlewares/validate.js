@@ -84,4 +84,10 @@ const updateServiceValidation = [
         .isLength({ max: 250 }).withMessage('Description cannot exceed 250 characters'),
 ];
 
-module.exports = { signupValidation, loginValidation, serviceValidation, updateServiceValidation };
+const bookTokenValidation = [
+  body('serviceId')
+    .notEmpty().withMessage('Service ID is required')
+    .isMongoId().withMessage('Invalid service ID format'),
+];
+
+module.exports = { signupValidation, loginValidation, serviceValidation, updateServiceValidation, bookTokenValidation };

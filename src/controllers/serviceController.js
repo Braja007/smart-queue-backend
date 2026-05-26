@@ -1,6 +1,8 @@
 const Service = require('../models/Service');
 const { sendSuccess, sendError } = require('../utils/response');
 const { validationResult } = require('express-validator');
+const Token = require('../models/Token');
+const { getTodayDate } = require('../utils/tokenUtils');
 
 const createService = async (req, res) => {
     const errors = validationResult(req);
@@ -142,4 +144,48 @@ const getServiceById = async (req, res) => {
     }
 };
 
-module.exports = { createService, getAllServices, getServiceById, updateService, deleteService };
+const getServiceStats = async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.id);
+        if (!service) {
+            return sendError(res, 404, 'Service not found');
+        }
+
+        const today = getTodayDate();
+
+        const [totalToday, waitingCount, completedCount, missedCount] =
+            await Promise.all([
+                Token.countDocuments({ service: req.params.id, bookedDate: today }),
+                Token.countDocuments({ service: req.params.id, bookedDate: today, status: 'waiting' }),
+                Token.countDocuments({ service: req.params.id, bookedDate: today, status: 'completed' }),
+                Token.countDocuments({ service: req.params.id, bookedDate: today, status: 'missed' }),
+            ]);
+
+        const stats = {
+            service: {
+                id: service._id,
+                name: service.name,
+                prefix: service.prefix,
+                isActive: service.isActive,
+            },
+            config: {
+                dailyLimit: service.dailyLimit,
+                avgProcessTime: service.avgProcessTime,
+                remainingSlots: service.dailyLimit - totalToday,
+            },
+            today: {
+                totalBooked: totalToday,
+                waiting: waitingCount,
+                completed: completedCount,
+                missed: missedCount,
+            },
+            date: today,
+        };
+
+        return sendSuccess(res, 200, 'Service stats fetched successfully', { stats });
+    } catch (error) {
+        console.error('Get stats error:', error.message);
+        return sendError(res, 500, 'Server error while fetching stats');
+    }
+};
+module.exports = { createService, getAllServices, getServiceById, updateService, deleteService, getServiceStats };

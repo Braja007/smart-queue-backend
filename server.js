@@ -5,6 +5,7 @@ const connectDB = require('./src/config/db');
 const authRoutes = require("./src/routes/authRoutes");
 const testRoutes = require("./src/routes/testRoutes");
 const serviceRoutes = require("./src/routes/serviceRoutes");
+const queueRoutes = require("./src/routes/queueRoutes");
 const helmet = require("helmet");
 
 const { notFound, errorHandler } = require("./src/middlewares/errorHandler");
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/queue', queueRoutes);
 app.use('/api/test', testRoutes);
 
 app.use(notFound);
