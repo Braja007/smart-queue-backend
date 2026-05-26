@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken, authorizeRoles } = require('../middlewares/authMiddleware');
 const { sendSuccess } = require('../utils/response');
+const { generateTokenNumber, getTodayCount } = require('../utils/tokenUtils');
+const Service = require('../models/Service');
 
 router.get('/user', verifyToken, (req, res) => {
     sendSuccess(res, 200, 'All authenticated users can access this', {
@@ -21,4 +23,27 @@ router.get('/admin', verifyToken, authorizeRoles('admin'), (req, res) => {
     });
 });
 
+router.get('/token-gen/:serviceId', verifyToken, async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.serviceId);
+        if (!service) {
+            return res.status(404).json({ success: false, message: 'Service not found' });
+        }
+
+        const tokenNumber = await generateTokenNumber(service.prefix);
+        const todayCount = await getTodayCount(service.prefix);
+
+        res.json({
+            success: true,
+            data: {
+                tokenNumber,
+                todayCount,
+                service: service.name,
+                prefix: service.prefix,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 module.exports = router;
