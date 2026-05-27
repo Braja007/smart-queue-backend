@@ -3,6 +3,8 @@ const Service = require('../models/Service');
 const { generateTokenNumber, getTodayCount, getTodayDate } = require('../utils/tokenUtils');
 const { sendSuccess, sendError } = require('../utils/response');
 const { validationResult } = require('express-validator');
+const Queue = require("../models/Queue");
+const { getOrInitQueue } = require("../utils/queueUtils");
 
 const bookToken = async (req, res) => {
     const errors = validationResult(req);
@@ -63,7 +65,10 @@ const bookToken = async (req, res) => {
             queuePosition: waitingAhead + 1,
             bookedDate: today,
         });
-
+        const queue = await getOrInitQueue(serviceId);
+        queue.waitingList.push(token._id);
+        await queue.save();
+        
         const estimatedWaitTime = waitingAhead * service.avgProcessTime;
 
         return sendSuccess(res, 201, 'Token booked successfully', {
