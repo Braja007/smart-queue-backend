@@ -46,4 +46,22 @@ router.get('/token-gen/:serviceId', verifyToken, async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+const { resetQueueIfNewDay } = require('../utils/queueUtils');
+const Queue = require('../models/Queue');
+
+router.get('/trigger-reset', verifyToken, authorizeRoles('admin'), async (req, res) => {
+  try {
+    const queues = await Queue.find({});
+    for (const queue of queues) {
+      // Force lastResetDate to yesterday to trigger reset
+      queue.lastResetDate = '2000-01-01';
+      await queue.save();
+      await resetQueueIfNewDay(queue);
+    }
+    res.json({ success: true, message: 'Reset triggered for all queues' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;

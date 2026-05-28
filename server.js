@@ -7,10 +7,12 @@ const testRoutes = require("./src/routes/testRoutes");
 const serviceRoutes = require("./src/routes/serviceRoutes");
 const queueRoutes = require("./src/routes/queueRoutes");
 const helmet = require("helmet");
+const { dailyQueueReset } = require('./src/utils/cronJobs');
 
 const { notFound, errorHandler } = require("./src/middlewares/errorHandler");
 
 connectDB();
+dailyQueueReset();
 
 const app = express();
 

@@ -145,4 +145,68 @@ const skipToken = async (req, res) => {
     }
 };
 
-module.exports = { callNext, completeToken, skipToken };
+const pauseQueue = async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.serviceId);
+        if (!service) {
+            return sendError(res, 404, 'Service not found');
+        }
+
+        const queue = await getOrInitQueue(req.params.serviceId);
+
+        if (queue.isPaused) {
+            return sendError(res, 400, 'Queue is already paused');
+        }
+
+        queue.isPaused = true;
+        await queue.save();
+
+        return sendSuccess(res, 200, `Queue paused for ${service.name}`, {
+            queue: {
+                service: service.name,
+                isPaused: queue.isPaused,
+                waitingCount: queue.waitingList.length,
+                currentToken: queue.currentToken
+                    ? queue.currentToken.tokenNumber
+                    : null,
+            },
+        });
+    } catch (error) {
+        console.error('Pause queue error:', error.message);
+        return sendError(res, 500, 'Server error while pausing queue');
+    }
+};
+
+const resumeQueue = async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.serviceId);
+        if (!service) {
+            return sendError(res, 404, 'Service not found');
+        }
+
+        const queue = await getOrInitQueue(req.params.serviceId);
+
+        if (!queue.isPaused) {
+            return sendError(res, 400, 'Queue is not paused');
+        }
+
+        queue.isPaused = false;
+        await queue.save();
+
+        return sendSuccess(res, 200, `Queue resumed for ${service.name}`, {
+            queue: {
+                service: service.name,
+                isPaused: queue.isPaused,
+                waitingCount: queue.waitingList.length,
+                currentToken: queue.currentToken
+                    ? queue.currentToken.tokenNumber
+                    : null,
+            },
+        });
+    } catch (error) {
+        console.error('Resume queue error:', error.message);
+        return sendError(res, 500, 'Server error while resuming queue');
+    }
+};
+
+module.exports = { callNext, completeToken, skipToken, pauseQueue, resumeQueue };
