@@ -85,9 +85,22 @@ const updateServiceValidation = [
 ];
 
 const bookTokenValidation = [
-  body('serviceId')
-    .notEmpty().withMessage('Service ID is required')
-    .isMongoId().withMessage('Invalid service ID format'),
+    body('serviceId')
+        .notEmpty().withMessage('Service ID is required')
+        .isMongoId().withMessage('Invalid service ID format'),
 ];
 
-module.exports = { signupValidation, loginValidation, serviceValidation, updateServiceValidation, bookTokenValidation };
+const rejoinValidation = [
+    body('tokenId')
+        .notEmpty().withMessage('Token ID is required')
+        .isMongoId().withMessage('Invalid token ID format'),
+];
+
+module.exports = { 
+    signupValidation,
+    loginValidation, 
+    serviceValidation, 
+    updateServiceValidation, 
+    bookTokenValidation,
+    rejoinValidation 
+};
