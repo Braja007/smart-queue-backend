@@ -68,7 +68,7 @@ const bookToken = async (req, res) => {
         const queue = await getOrInitQueue(serviceId);
         queue.waitingList.push(token._id);
         await queue.save();
-        
+
         const estimatedWaitTime = waitingAhead * service.avgProcessTime;
 
         return sendSuccess(res, 201, 'Token booked successfully', {
@@ -173,4 +173,154 @@ const cancelToken = async (req, res) => {
     }
 };
 
-module.exports = { bookToken, getMyTokens, cancelToken };
+const getTokenStatus = async (req, res) => {
+    try {
+        const token = await Token.findById(req.params.tokenId)
+            .populate('service', 'name prefix avgProcessTime')
+            .populate('student', 'name email');
+        if (!token) {
+            return sendError(res, 404, 'Token not found');
+        }
+        if (req.user.role === 'student' && token.student._id.toString() !== req.user._id.toString()) {
+            return sendError(res, 403, 'You can only view status of your own tokens');
+        }
+        const today = getTodayDate();
+
+        // If the token is already completed, missed, or cancelled return status directly with no queue info
+        if (!['waiting', 'called'].includes(token.status)) {
+            return sendSuccess(res, 200, 'Token status fetched', {
+                token: {
+                    id: token._id,
+                    tokenNumber: token.tokenNumber,
+                    service: token.service.name,
+                    status: token.status,
+                    bookedDate: token.bookedDate,
+                    calledAt: token.calledAt || null,
+                    completedAt: token.completedAt || null,
+                    missedAt: token.missedAt || null,
+                },
+            });
+        }
+        const queue = await Queue.findOne({ service: token.service._id });
+
+        let peopleAhead = 0;
+        let queuePosition = 0;
+
+        if (queue) {
+            // Find position in waiting list
+            const waitingIds = queue.waitingList.map((id) => id.toString());
+            const positionIndex = waitingIds.indexOf(token._id.toString());
+
+            if (positionIndex !== -1) {
+                peopleAhead = positionIndex;
+                queuePosition = positionIndex + 1;
+            }
+
+            // If token is currently being called it's at position 0
+            if (queue.currentToken && queue.currentToken.toString() === token._id.toString()) {
+                peopleAhead = 0;
+                queuePosition = 0;
+            }
+        }
+        const estimatedWaitTime = peopleAhead * token.service.avgProcessTime;
+
+        return sendSuccess(res, 200, 'Token status fetched successfully', {
+            token: {
+                id: token._id,
+                tokenNumber: token.tokenNumber,
+                service: token.service.name,
+                status: token.status,
+                bookedDate: token.bookedDate,
+                bookedAt: token.createdAt,
+            },
+            queue: {
+                queuePosition,
+                peopleAhead,
+                estimatedWaitTime: `${estimatedWaitTime} minutes`,
+                isCurrentlyBeingServed: queuePosition === 0 && token.status === 'called',
+            },
+        });
+    } catch (error) {
+        console.error('Get token status error:', error.message);
+        return sendError(res, 500, 'Server error while fetching token status');
+    }
+};
+
+const getMyQueuePosition = async (req, res) => {
+    try {
+        const today = getTodayDate();
+
+        const token = await Token.findOne({
+            student: req.user._id,
+            service: req.params.serviceId,
+            bookedDate: today,
+            status: { $in: ['waiting', 'called'] },
+        }).populate('service', 'name prefix avgProcessTime');
+
+        if (!token) {
+            return sendError(
+                res,
+                404,
+                'No active token found for this service today'
+            );
+        }
+
+        const queue = await Queue.findOne({ service: req.params.serviceId });
+
+        let peopleAhead = 0;
+        let queuePosition = 0;
+        let isCurrentlyBeingServed = false;
+
+        if (queue) {
+            // Check if currently being served
+            if ( queue.currentToken && queue.currentToken.toString() === token._id.toString()) {
+                peopleAhead = 0;
+                queuePosition = 0;
+                isCurrentlyBeingServed = true;
+            } else {
+                // Find position in waiting list
+                const waitingIds = queue.waitingList.map((id) => id.toString());
+                const positionIndex = waitingIds.indexOf(token._id.toString());
+
+                if (positionIndex !== -1) {
+                    peopleAhead = positionIndex;
+                    queuePosition = positionIndex + 1;
+                }
+            }
+        }
+
+        const estimatedWaitTime = peopleAhead * token.service.avgProcessTime;
+
+        // Dynamic message based on position
+        let message = '';
+        if (isCurrentlyBeingServed) {
+            message = 'Your token is currently being served. Please proceed to the counter';
+        } else if (peopleAhead === 0 && !isCurrentlyBeingServed) {
+            message = 'You are next in line. Please be ready';
+        } else if (peopleAhead <= 3) {
+            message = `Only ${peopleAhead} people ahead. Please stay nearby`;
+        } else {
+            message = `${peopleAhead} people ahead. Estimated wait: ${estimatedWaitTime} minutes`;
+        }
+
+        return sendSuccess(res, 200, 'Queue position fetched successfully', {
+            token: {
+                id: token._id,
+                tokenNumber: token.tokenNumber,
+                service: token.service.name,
+                status: token.status,
+            },
+            queue: {
+                queuePosition,
+                peopleAhead,
+                estimatedWaitTime: `${estimatedWaitTime} minutes`,
+                isCurrentlyBeingServed,
+            },
+            message,
+        });
+    } catch (error) {
+        console.error('Get position error:', error.message);
+        return sendError(res, 500, 'Server error while fetching queue position');
+    }
+};
+module.exports = { bookToken, getMyTokens, cancelToken, getTokenStatus, getMyQueuePosition };
