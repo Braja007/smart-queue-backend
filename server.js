@@ -6,6 +6,7 @@ const authRoutes = require("./src/routes/authRoutes");
 const testRoutes = require("./src/routes/testRoutes");
 const serviceRoutes = require("./src/routes/serviceRoutes");
 const queueRoutes = require("./src/routes/queueRoutes");
+const studentRoutes = require("./src/routes/studentRoutes");
 const helmet = require("helmet");
 const { dailyQueueReset } = require('./src/utils/cronJobs');
 
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/queue', queueRoutes);
 app.use('/api/test', testRoutes);
+app.use('/api/student', studentRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
