@@ -10,6 +10,7 @@ const studentRoutes = require("./src/routes/studentRoutes");
 const staffRoutes = require("./src/routes/staffRoutes");
 const helmet = require("helmet");
 const { dailyQueueReset } = require('./src/utils/cronJobs');
+const analyticsRoutes = require('./src/routes/analyticsRoutes');
 
 const { notFound, errorHandler } = require("./src/middlewares/errorHandler");
 
@@ -33,6 +34,7 @@ app.use('/api/queue', queueRoutes);
 app.use('/api/test', testRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/staff',staffRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
