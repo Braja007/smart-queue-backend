@@ -3,11 +3,13 @@ const { body, param, query } = require('express-validator');
 const signupValidation = [
     body('name')
         .trim()
+        .escape()
         .notEmpty().withMessage('Name is required')
         .isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
 
     body('email')
         .trim()
+        .normalizeEmail()
         .notEmpty().withMessage('Email is required')
         .isEmail().withMessage('Please provide a valid email'),
 
@@ -23,6 +25,7 @@ const signupValidation = [
 const loginValidation = [
     body('email')
         .trim()
+        .normalizeEmail()
         .notEmpty().withMessage('Email is required')
         .isEmail().withMessage('Please provide a valid email'),
 

@@ -7,6 +7,7 @@ const { dailyQueueReset } = require('./src/utils/cronJobs');
 const corsOptions = require('./src/config/corsConfig');
 const { generalLimiter, authLimiter, bookingLimiter, analyticsLimiter } = require('./src/config/securityConfig');
 const { notFound, errorHandler } = require("./src/middlewares/errorHandler");
+const mongoSanitize = require('express-mongo-sanitize');
 
 const authRoutes = require("./src/routes/authRoutes");
 const testRoutes = require("./src/routes/testRoutes");
@@ -26,6 +27,10 @@ app.use(cors(corsOptions));
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Sanitize against NoSQL injection
+app.use(mongoSanitize());
+
 
 app.use(generalLimiter);
 
