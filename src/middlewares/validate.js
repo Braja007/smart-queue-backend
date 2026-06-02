@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, param, query } = require('express-validator');
 
 const signupValidation = [
     body('name')
@@ -96,11 +96,51 @@ const rejoinValidation = [
         .isMongoId().withMessage('Invalid token ID format'),
 ];
 
+const validateMongoId = [
+  param('id')
+    .isMongoId().withMessage('Invalid ID format'),
+];
+
+const validateServiceId = [
+  param('serviceId')
+    .isMongoId().withMessage('Invalid service ID format'),
+];
+
+const validateTokenId = [
+  param('tokenId')
+    .isMongoId().withMessage('Invalid token ID format'),
+];
+
+const paginationValidation = [
+  query('page')
+    .optional()
+    .isInt({ min: 1 }).withMessage('Page must be a positive number'),
+
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+];
+
+const analyticsDateValidation = [
+  query('date')
+    .optional()
+    .isDate().withMessage('Date must be in YYYY-MM-DD format'),
+
+  query('days')
+    .optional()
+    .isInt({ min: 1, max: 90 }).withMessage('Days must be between 1 and 90'),
+];
+
 module.exports = { 
     signupValidation,
     loginValidation, 
     serviceValidation, 
     updateServiceValidation, 
     bookTokenValidation,
-    rejoinValidation 
+    rejoinValidation,
+    validateMongoId,
+    validateServiceId,
+    validateTokenId,
+    paginationValidation,
+    analyticsDateValidation
 };
