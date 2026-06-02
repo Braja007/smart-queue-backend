@@ -46,7 +46,10 @@ const tokenSchema = new mongoose.Schema(
 );
 
 tokenSchema.index({ service: 1, bookedDate: 1 });
-
 tokenSchema.index({ student: 1, bookedDate: 1 });
+
+tokenSchema.index({ bookedDate: 1, status: 1 });
+tokenSchema.index({ bookedDate: 1, service: 1, status: 1 });
+tokenSchema.index({ createdAt: 1 });
 
 module.exports = mongoose.model('Token', tokenSchema);
