@@ -10,7 +10,6 @@ const { notFound, errorHandler } = require("./src/middlewares/errorHandler");
 const mongoSanitize = require('express-mongo-sanitize');
 
 const authRoutes = require("./src/routes/authRoutes");
-const testRoutes = require("./src/routes/testRoutes");
 const serviceRoutes = require("./src/routes/serviceRoutes");
 const queueRoutes = require("./src/routes/queueRoutes");
 const studentRoutes = require("./src/routes/studentRoutes");
@@ -38,13 +37,12 @@ app.get('/', (req, res) => {
     res.send('Smart Queue API is running...');
 });
 
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/services', serviceRoutes);
-app.use('/api/queue', bookingLimiter, queueRoutes);
-app.use('/api/test', testRoutes);
-app.use('/api/student', studentRoutes);
-app.use('/api/staff', staffRoutes);
-app.use('/api/analytics', analyticsLimiter, analyticsRoutes);
+app.use('/auth', authLimiter, authRoutes);
+app.use('/services', serviceRoutes);
+app.use('/queue', bookingLimiter, queueRoutes);
+app.use('/student', studentRoutes);
+app.use('/staff', staffRoutes);
+app.use('/analytics', analyticsLimiter, analyticsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
