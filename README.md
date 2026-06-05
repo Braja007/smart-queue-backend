@@ -1,6 +1,15 @@
 # 🎟️ Smart Queue Management System
 
-A production-ready backend API for managing queues across multiple service offices. Built with Node.js, Express, MongoDB, and JWT authentication.
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
+
+> A production-ready, highly secure REST API for managing virtual waitlists and service queues. Designed to eliminate physical waiting lines by providing real-time token tracking, automated wait-time estimations, and comprehensive administrative analytics.
+
+### 🌐 Live Demo
+**API Base URL:** `https://smart-queue-backend.onrender.com`
 
 ---
 
