@@ -1,0 +1,2713 @@
+{
+  "info": {
+    "_postman_id": "ceb90071-c814-424c-be8e-7b2d024c59e0",
+    "name": "Smart Queue API",
+    "description": "## Smart Queue API\n\nThe **Smart Queue API** is a queue management system designed to eliminate physical waiting lines by enabling students to book virtual tokens, track their position in real time, and receive notifications when it's their turn. It provides staff and administrators with full control over queue operations, service configuration, and data-driven analytics — making queue management efficient, transparent, and scalable.\n\n---\n\n## Getting Started\n\n### Base URL\n\nAll requests are made relative to the `{{baseUrl}}` environment variable. Set this in the **Smart Queue Local** environment (or your own environment) before sending any requests.\n\n### Authentication\n\nMost endpoints are protected and require a Bearer token. To authenticate:\n\n1. Use the **Auth > Login** endpoint with your credentials.\n2. Copy the token from the response and set the appropriate environment variable:\n   - `studentToken` — for student-facing endpoints\n   - `staffToken` — for staff queue management and dashboard endpoints\n   - `adminToken` — for administrative and analytics endpoints\n3. The collection is pre-configured to use these variables in the `Authorization` header — no manual header setup is needed once the variables are set.\n\n---\n\n## Folder Structure\n\nThe collection is organized into **7 folders**, each representing a distinct functional domain of the API:\n\n| Folder | Role | Description |\n|---|---|---|\n| **Auth** | All roles | User registration, login, and profile management. Start here to obtain authentication tokens. |\n| **Services** | Staff / Admin | Create, read, update, and delete queue services. Also includes service-level statistics. |\n| **Queue-Student** | Student | Full token lifecycle for students — book a token, check queue position, cancel, rejoin, and view missed token history. |\n| **Queue-Staff** | Staff | Operational queue controls — initialize a queue, update its state, call the next token, pause/resume, skip, complete, and manage missed tokens. |\n| **Student Dashboard** | Student | A consolidated student view — dashboard summary, full token history, and the ability to cancel an active token. |\n| **Staff Dashboard** | Staff | Operational overview for staff — dashboard summary, active queue list, tokens processed today, and the missed tokens list. |\n| **Analytics** | Staff / Admin | Reporting and insights — daily statistics, peak hours, office comparison, average wait times, most crowded periods, and per-student insights. |\n\n### How the Folders Relate\n\nThe typical workflow flows as follows:\n\n1. **Auth** — Authenticate and obtain a token.\n2. **Services** — Staff/admins configure the services that students can queue for.\n3. **Queue-Student / Queue-Staff** — Students book tokens while staff manage the live queue in parallel.\n4. **Student Dashboard / Staff Dashboard** — Both roles get a summarized operational view of their activity.\n5. **Analytics** — Staff and admins review historical data and performance metrics.\n\n---\n\n## Environment Variables\n\nThe following variables are used across the collection and should be configured in your active environment:\n\n- `baseUrl` — The root URL of the API server (e.g., `http://localhost:3000`)\n- `studentToken` — Bearer token for student-authenticated requests\n- `staffToken` — Bearer token for staff-authenticated requests\n- `adminToken` — Bearer token for admin-authenticated requests\n- `serviceId` — ID of the target service (used in service and queue requests)\n- `tokenId` — ID of the target queue token (used in token management requests)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51084557",
+    "_collection_link": "https://go.postman.co/collection/51084557-ceb90071-c814-424c-be8e-7b2d024c59e0?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Braja\", \"email\": \"brozodeka@test.com\", \"password\": \"123456\" , \"role\": \"admin\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
+            "description": "`POST {{baseUrl}}/api/auth/signup`\n\nRegisters a new user account in the Smart Queue system. The request body should include the user's name, email, password, and role (e.g., `student` or `staff`). On success, returns the newly created user object along with an access token. This is the first step for any new user before they can interact with protected endpoints.\n"
+          },
+          "response": [
+            {
+              "name": "Signup",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"name\": \"Braja\", \"email\": \"brozodeka@test.com\", \"password\": \"123456\" , \"role\": \"admin\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/signup",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "signup"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "10;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "10"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "9"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "900"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "157"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"9d-0ef3zEqf2pTO1rPdN1rihbJmr68\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 03 Jun 2026 05:15:56 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"User registered successfully\",\n    \"data\": {\n        \"id\": \"6a1fb88ce89beab6444a7489\",\n        \"name\": \"Braja\",\n        \"email\": \"brozodeka@test.com\",\n        \"role\": \"admin\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"email\": \"brozo@test.com\", \"password\": \"123456\" }\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "`POST {{baseUrl}}/api/auth/login`\n\nAuthenticates an existing user and returns a Bearer access token. Send the user's `email` and `password` in the request body. Copy the returned token and set it as the appropriate environment variable — `studentToken`, `staffToken`, or `adminToken` — depending on the user's role. This token must be included in the `Authorization` header for all protected requests.\n"
+          },
+          "response": [
+            {
+              "name": "Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"email\": \"brozo@test.com\", \"password\": \"123456\" }\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "10;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "10"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "9"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "900"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "352"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"160-cFVu0Jp5zA02E7pnZXMUaCC1Dsk\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 03 Jun 2026 05:34:54 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMWZhNGZjZTg5YmVhYjY0NDRhNzQ4OCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4MDQ2NDg5NCwiZXhwIjoxNzgxMDY5Njk0fQ.Bv9JiE8oJf72ZhcG8uaU9mZBTTEUasJ39qxJnRaoqyQ\",\n        \"user\": {\n            \"id\": \"6a1fa4fce89beab6444a7488\",\n            \"name\": \"Braja\",\n            \"email\": \"brozo@test.com\",\n            \"role\": \"admin\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/auth/me`\n\nReturns the profile details of the currently authenticated user. No request body is required — the user is identified from the Bearer token in the `Authorization` header. The response includes the user's ID, name, email, role, and account metadata. Useful for verifying the active session or displaying user information in the UI.\n"
+          },
+          "response": [
+            {
+              "name": "Me",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "10;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "10"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "8"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "803"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "193"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"c1-uCJ9Pl/F4KvkuAneR4sr7QnGTJE\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 03 Jun 2026 05:36:31 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"User profile fetched\",\n    \"data\": {\n        \"user\": {\n            \"id\": \"6a1fa4fce89beab6444a7488\",\n            \"name\": \"Braja\",\n            \"email\": \"brozo@test.com\",\n            \"role\": \"admin\",\n            \"createdAt\": \"2026-06-03T03:52:28.912Z\"\n        }\n    }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Handles user identity and access for the Smart Queue system. This folder contains the core authentication endpoints that manage how users register, log in, and retrieve their profile information.\n\n**Endpoints:**\n\n- **Signup** — Registers a new user account (student or staff) in the system.\n    \n- **Login** — Authenticates an existing user and returns an access token to be used in subsequent requests.\n    \n- **Me** — Returns the profile details of the currently authenticated user, based on the provided token.\n    \n\n> Obtain a token via the Login endpoint and set it as the appropriate environment variable (`studentToken`, `staffToken`, or `adminToken`) before making requests to other protected endpoints.",
+      "auth": {
+        "type": "noauth"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "Create Service",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "`POST {{baseUrl}}/api/services/create`\n\nCreates a new service that students can queue for (e.g., a specific office counter or department). Restricted to staff and administrators — use the `staffToken` or `adminToken` environment variable for authorization.\n\n**Request Body:**\n- `name` — Name of the service\n- `description` — Brief description of the service\n- `capacity` *(optional)* — Maximum number of concurrent tokens\n- `operatingHours` *(optional)* — Scheduled availability of the service\n\n**Response:** Returns the newly created service object with its assigned `serviceId`."
+          },
+          "response": [
+            {
+              "name": "Create Service",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"General Medicine\",\r\n  \"prefix\": \"MED\",\r\n  \"dailyLimit\": 60,\r\n  \"avgProcessTime\": 15,\r\n  \"description\": \"Routine checkups, consultations, and general medical assessments\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/services/create",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "services",
+                    "create"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "100"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "94"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "298"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "371"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"173-C733x9gvB7SGkMn1r6Nzdd/GLOU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:04:58 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Service created successfully\",\n    \"data\": {\n        \"service\": {\n            \"name\": \"General Medicine\",\n            \"prefix\": \"MED\",\n            \"dailyLimit\": 60,\n            \"avgProcessTime\": 15,\n            \"isActive\": true,\n            \"description\": \"Routine checkups, consultations, and general medical assessments\",\n            \"_id\": \"6a223cda9106e388e7d55ac9\",\n            \"createdAt\": \"2026-06-05T03:04:58.173Z\",\n            \"updatedAt\": \"2026-06-05T03:04:58.173Z\",\n            \"__v\": 0\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "All Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/services`\n\nReturns a list of all services available in the Smart Queue system. No request body is required. Students can use this endpoint to discover available services before booking a token, while staff can use it to get an overview of all configured services.\n\n**Response includes (per service):**\n\n- `serviceId` — Unique identifier of the service\n    \n- `name` — Service name\n    \n- `description` — Service description\n    \n- `status` — Current availability status"
+          },
+          "response": [
+            {
+              "name": "All Services",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/services",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "services"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "100"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "93"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "245"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "1755"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"6db-REdl7SEtVEzNeb6RLLItAmsK8WQ\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:05:50 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Services fetched successfully\",\n    \"data\": {\n        \"count\": 6,\n        \"services\": [\n            {\n                \"_id\": \"6a223cda9106e388e7d55ac9\",\n                \"name\": \"General Medicine\",\n                \"prefix\": \"MED\",\n                \"dailyLimit\": 60,\n                \"avgProcessTime\": 15,\n                \"isActive\": true,\n                \"description\": \"Routine checkups, consultations, and general medical assessments\",\n                \"createdAt\": \"2026-06-05T03:04:58.173Z\",\n                \"updatedAt\": \"2026-06-05T03:04:58.173Z\",\n                \"__v\": 0\n            },\n            {\n                \"_id\": \"6a127d385766fd07d1c780d1\",\n                \"name\": \"Payment & Finance\",\n                \"prefix\": \"P\",\n                \"dailyLimit\": 200,\n                \"avgProcessTime\": 5,\n                \"isActive\": true,\n                \"description\": \"Tuition payments, fees, and financial aid\",\n                \"createdAt\": \"2026-05-24T04:23:20.793Z\",\n                \"updatedAt\": \"2026-05-25T02:01:10.867Z\",\n                \"__v\": 0\n            },\n            {\n                \"_id\": \"6a127d2a5766fd07d1c780d0\",\n                \"name\": \"Examination Office\",\n                \"prefix\": \"E\",\n                \"dailyLimit\": 60,\n                \"avgProcessTime\": 8,\n                \"isActive\": true,\n                \"description\": \"Exam schedules, permits, and results\",\n                \"createdAt\": \"2026-05-24T04:23:06.546Z\",\n                \"updatedAt\": \"2026-05-24T04:23:06.546Z\",\n                \"__v\": 0\n            },\n            {\n                \"_id\": \"6a127d1c5766fd07d1c780cf\",\n                \"name\": \"Student Services\",\n                \"prefix\": \"S\",\n                \"dailyLimit\": 120,\n                \"avgProcessTime\": 7,\n                \"isActive\": true,\n                \"description\": \"Student ID, scholarships, and general assistance\",\n                \"createdAt\": \"2026-05-24T04:22:52.394Z\",\n                \"updatedAt\": \"2026-05-24T04:22:52.394Z\",\n                \"__v\": 0\n            },\n            {\n                \"_id\": \"6a127d045766fd07d1c780ce\",\n                \"name\": \"Health Services\",\n                \"prefix\": \"H\",\n                \"dailyLimit\": 80,\n                \"avgProcessTime\": 15,\n                \"isActive\": true,\n                \"description\": \"Medical consultations and health certificates\",\n                \"createdAt\": \"2026-05-24T04:22:28.773Z\",\n                \"updatedAt\": \"2026-05-24T04:22:28.773Z\",\n                \"__v\": 0\n            },\n            {\n                \"_id\": \"6a127ccf5766fd07d1c780cd\",\n                \"name\": \"Academic Affairs\",\n                \"prefix\": \"A\",\n                \"dailyLimit\": 100,\n                \"avgProcessTime\": 10,\n                \"isActive\": true,\n                \"description\": \"Handles academic records, transcripts, and enrollment\",\n                \"createdAt\": \"2026-05-24T04:21:35.432Z\",\n                \"updatedAt\": \"2026-05-24T04:21:35.432Z\",\n                \"__v\": 0\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Service By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/services/{{serviceId}}`\n\nRetrieves the full details of a specific service using its unique identifier. Provide the `serviceId` as a path parameter — you can use the `{{serviceId}}` environment variable. Useful for displaying service information to students or for staff to inspect a specific service before making changes.\n\n**Path Parameter:**\n- `serviceId` — The unique ID of the service to retrieve\n\n**Response:** Returns the service name, description, status, and full configuration details."
+          },
+          "response": [
+            {
+              "name": "Service By ID",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/services/{{serviceId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "services",
+                    "{{serviceId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "100"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "92"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "174"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "349"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"15d-wrjkcetuWCDF66A/sxlPPNhN/Bk\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:07:01 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Service fetched successfully\",\n    \"data\": {\n        \"service\": {\n            \"_id\": \"6a127d045766fd07d1c780ce\",\n            \"name\": \"Health Services\",\n            \"prefix\": \"H\",\n            \"dailyLimit\": 80,\n            \"avgProcessTime\": 15,\n            \"isActive\": true,\n            \"description\": \"Medical consultations and health certificates\",\n            \"createdAt\": \"2026-05-24T04:22:28.773Z\",\n            \"updatedAt\": \"2026-05-24T04:22:28.773Z\",\n            \"__v\": 0\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Service",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ]
+            },
+            "description": "`PUT {{baseUrl}}/api/services/{{serviceId}}`\n\nUpdates the configuration or metadata of an existing service. Provide the `serviceId` in the path and include only the fields you wish to update in the request body. Restricted to staff and administrators — use the `staffToken` or `adminToken` environment variable for authorization.\n\n**Path Parameter:**\n- `serviceId` — The unique ID of the service to update\n\n**Request Body (any updatable fields):**\n- `name` — Updated service name\n- `description` — Updated description\n- `capacity` — Updated token capacity\n- `operatingHours` — Updated schedule\n\n**Response:** Returns the updated service object on success."
+          },
+          "response": [
+            {
+              "name": "Update Service",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"dailyLimit\": 150,\r\n  \"avgProcessTime\": 8\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/services/{{serviceId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "services",
+                    "{{serviceId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "100"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "91"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "119"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "349"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"15d-o4Np8vvrRuFaeuP6YH4NwvXIQ+o\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:07:57 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Service updated successfully\",\n    \"data\": {\n        \"service\": {\n            \"_id\": \"6a127d045766fd07d1c780ce\",\n            \"name\": \"Health Services\",\n            \"prefix\": \"H\",\n            \"dailyLimit\": 150,\n            \"avgProcessTime\": 8,\n            \"isActive\": true,\n            \"description\": \"Medical consultations and health certificates\",\n            \"createdAt\": \"2026-05-24T04:22:28.773Z\",\n            \"updatedAt\": \"2026-06-05T03:07:56.954Z\",\n            \"__v\": 0\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Service",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "`DELETE {{baseUrl}}/api/services/{{serviceId}}`\n\nDeletes or deactivates a specific service from the Smart Queue system. Once removed, the service will no longer be available for token booking. Restricted to administrators — use the `adminToken` environment variable for authorization.\n\n**Path Parameter:**\n- `serviceId` — The unique ID of the service to delete\n\n**Response:** Returns a confirmation of deletion or deactivation on success."
+          },
+          "response": [
+            {
+              "name": "Delete Service",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/services/{{serviceId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "services",
+                    "{{serviceId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "100"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "90"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "43"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "158"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"9e-nEGzVHOf4UBdbTKDVMB6bUDjqyA\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:09:12 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Service deleted successfully\",\n    \"data\": {\n        \"deletedService\": {\n            \"id\": \"6a223cda9106e388e7d55ac9\",\n            \"name\": \"General Medicine\",\n            \"prefix\": \"MED\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Service Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/services/{{serviceId}}/stats`\n\nReturns usage statistics for a specific service. Useful for staff and administrators to evaluate service performance and make informed operational decisions. Use the `staffToken` or `adminToken` environment variable for authorization.\n\n**Path Parameter:**\n- `serviceId` — The unique ID of the service to retrieve stats for\n\n**Response includes:**\n- Total tokens served\n- Average wait time\n- Peak usage periods\n- Other relevant performance metrics"
+          },
+          "response": [
+            {
+              "name": "Service Stats",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/services/{{serviceId}}/stats",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "services",
+                    "{{serviceId}}",
+                    "stats"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "100"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "99"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "900"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "331"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"14b-8nLpZ2esCMIymfiVNEJZ/5z3RaM\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:10:19 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Service stats fetched successfully\",\n    \"data\": {\n        \"stats\": {\n            \"service\": {\n                \"id\": \"6a127d045766fd07d1c780ce\",\n                \"name\": \"Health Services\",\n                \"prefix\": \"H\",\n                \"isActive\": true\n            },\n            \"config\": {\n                \"dailyLimit\": 150,\n                \"avgProcessTime\": 8,\n                \"remainingSlots\": 150\n            },\n            \"today\": {\n                \"totalBooked\": 0,\n                \"waiting\": 0,\n                \"completed\": 0,\n                \"missed\": 0\n            },\n            \"date\": \"2026-06-05\"\n        }\n    }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Manages the configuration and administration of services offered through the Smart Queue system. This folder contains endpoints for creating, retrieving, updating, and deleting services, as well as viewing service-level statistics.\n\n**Endpoints:**\n\n- **Create Service** — Creates a new service that students can queue for (e.g., a specific office counter or department).\n    \n- **All Services** — Returns a list of all available services in the system.\n    \n- **Service By ID** — Retrieves the details of a specific service using its unique identifier.\n    \n- **Update Service** — Updates the configuration or metadata of an existing service.\n    \n- **Delete Service** — Deletes or performs a specific action on a service (e.g., deactivation or removal).\n    \n- **Service Stats** — Returns usage statistics for a specific service, such as total tokens served and average wait time.\n    \n\n> Service management endpoints are typically restricted to **staff and administrators**. Use the `staffToken` or `adminToken` environment variable for authorization. The `serviceId` environment variable can be used to reference a specific service across requests.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Queue-Student",
+      "item": [
+        {
+          "name": "Book Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "`POST {{baseUrl}}/api/queue/token`\n\nBooks a new queue token for the authenticated student at a specific service. The request body should include the `serviceId` of the service the student wants to queue for. On success, returns the token details including the token number, estimated wait time, and current queue position. Use the `studentToken` environment variable for authorization.\n\n**Role:** Student\n\n**Request Body:**\n- `serviceId` *(required)* — The ID of the service to queue for (use `{{serviceId}}`)\n\n**Response includes:**\n- Token number and token ID\n- Current queue position\n- Estimated wait time"
+          },
+          "response": [
+            {
+              "name": "Book Token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"serviceId\": \"{{serviceId}}\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/queue/token",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "queue",
+                    "token"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "5;w=60"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "5"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "4"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "60"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "287"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"11f-AV/1A+QCLt/M6b6uPTqUlNj6m88\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:12:51 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Token booked successfully\",\n    \"data\": {\n        \"token\": {\n            \"id\": \"6a223eb29106e388e7d55aca\",\n            \"tokenNumber\": \"H001\",\n            \"service\": \"Health Services\",\n            \"status\": \"waiting\",\n            \"queuePosition\": 1,\n            \"estimatedWaitTime\": \"0 minutes\",\n            \"bookedDate\": \"2026-06-05\",\n            \"bookedAt\": \"2026-06-05T03:12:50.536Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "My Tokens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/queue/my-tokens`\n\nReturns all tokens associated with the authenticated student, including active, completed, and cancelled tokens. No request body is required — the student is identified from the Bearer token in the `Authorization` header. Use the `studentToken` environment variable for authorization.\n\n**Role:** Student\n\n**Response includes:**\n- Token ID and token number\n- Status (`waiting`, `called`, `completed`, `cancelled`)\n- Service name and booking timestamp"
+          },
+          "response": [
+            {
+              "name": "My Tokens",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/queue/my-tokens",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "queue",
+                    "my-tokens"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "5;w=60"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "5"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "3"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "26"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "499"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1f3-VxgZmlDHGFaSDwD51O6QlaNu+ws\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:13:24 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Tokens fetched successfully\",\n    \"data\": {\n        \"tokens\": [\n            {\n                \"_id\": \"6a223eb29106e388e7d55aca\",\n                \"tokenNumber\": \"H001\",\n                \"service\": {\n                    \"_id\": \"6a127d045766fd07d1c780ce\",\n                    \"name\": \"Health Services\",\n                    \"prefix\": \"H\",\n                    \"avgProcessTime\": 8\n                },\n                \"student\": \"6a1fa182619fbbac6aed4778\",\n                \"status\": \"waiting\",\n                \"queuePosition\": 1,\n                \"bookedDate\": \"2026-06-05\",\n                \"isRejoined\": false,\n                \"createdAt\": \"2026-06-05T03:12:50.536Z\",\n                \"updatedAt\": \"2026-06-05T03:12:50.536Z\",\n                \"__v\": 0\n            }\n        ],\n        \"pagination\": {\n            \"total\": 1,\n            \"page\": 1,\n            \"limit\": 10,\n            \"totalPages\": 1\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel Token",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "`PUT {{baseUrl}}/api/queue/cancel/{{tokenId}}`\n\nCancels an existing active token, removing the student from the queue. Provide the `tokenId` as a path parameter (or use the `{{tokenId}}` environment variable) to identify the token to cancel. Once cancelled, the student's position in the queue is released and cannot be recovered without rebooking. Use the `studentToken` environment variable for authorization.\n\n**Role:** Student\n\n**Path Parameter:**\n- `tokenId` *(required)* — The ID of the token to cancel (use `{{tokenId}}`)\n\n**Response includes:**\n- Confirmation of cancellation\n- Updated token status"
+          },
+          "response": [
+            {
+              "name": "Cancel Token",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/queue/cancel/{{tokenId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "queue",
+                    "cancel",
+                    "{{tokenId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "5;w=60"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "5"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "4"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "60"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "178"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"b2-m09nzOdPpU8sDyt+9EVaXMefmMo\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:17:02 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Token cancelled successfully\",\n    \"data\": {\n        \"token\": {\n            \"id\": \"6a223eb29106e388e7d55aca\",\n            \"tokenNumber\": \"H001\",\n            \"service\": \"Health Services\",\n            \"status\": \"cancelled\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Token Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/queue/status/{{tokenId}}`\n\nRetrieves the current status of a specific token. Provide the `tokenId` as a path parameter (or use the `{{tokenId}}` environment variable) in the request. Use the `studentToken` environment variable for authorization.\n\n**Role:** Student\n\n**Path Parameter:**\n- `tokenId` *(required)* — The ID of the token to check (use `{{tokenId}}`)\n\n**Response includes:**\n- Token state: `waiting`, `called`, `completed`, or `missed`\n- Relevant timestamps (e.g., booked at, called at)"
+          },
+          "response": [
+            {
+              "name": "Token Status",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/queue/status/{{tokenId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "queue",
+                    "status",
+                    "{{tokenId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "5;w=60"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "5"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "4"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "60"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "352"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"160-M/3GK4YvZcDvQNcCG94UvENZ/DA\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:15:11 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Token status fetched successfully\",\n    \"data\": {\n        \"token\": {\n            \"id\": \"6a223eb29106e388e7d55aca\",\n            \"tokenNumber\": \"H001\",\n            \"service\": \"Health Services\",\n            \"status\": \"waiting\",\n            \"bookedDate\": \"2026-06-05\",\n            \"bookedAt\": \"2026-06-05T03:12:50.536Z\"\n        },\n        \"queue\": {\n            \"queuePosition\": 1,\n            \"peopleAhead\": 0,\n            \"estimatedWaitTime\": \"0 minutes\",\n            \"isCurrentlyBeingServed\": false\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "My Queue Position",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/queue/position/{{serviceId}}`\n\nReturns the student's current position in the queue for a given active token. Provide the `tokenId` as a path parameter (or use the `{{tokenId}}` environment variable) to identify the token. Use the `studentToken` environment variable for authorization.\n\n**Role:** Student\n\n**Path Parameter:**\n- `tokenId` *(required)* — The ID of the active token (use `{{tokenId}}`)\n\n**Response includes:**\n- Current position number in the queue\n- Estimated wait time"
+          },
+          "response": [
+            {
+              "name": "My Queue Position",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/queue/position/{{serviceId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "queue",
+                    "position",
+                    "{{serviceId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "5;w=60"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "5"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "3"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "24"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "340"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"154-s+d/Q/fxLQniI8w1Q217TnMhKc0\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:15:47 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Queue position fetched successfully\",\n    \"data\": {\n        \"token\": {\n            \"id\": \"6a223eb29106e388e7d55aca\",\n            \"tokenNumber\": \"H001\",\n            \"service\": \"Health Services\",\n            \"status\": \"waiting\"\n        },\n        \"queue\": {\n            \"queuePosition\": 1,\n            \"peopleAhead\": 0,\n            \"estimatedWaitTime\": \"0 minutes\",\n            \"isCurrentlyBeingServed\": false\n        },\n        \"message\": \"You are next in line. Please be ready\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Rejoin Queue",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "`POST {{baseUrl}}/api/queue/rejoin`\n\nAllows a student to rejoin the queue after having been marked as missed or skipped. Provide the `tokenId` of the missed token as a path parameter in the request. On success, the student is re-added to the queue — typically at the end or at a designated re-entry position depending on system configuration. Use the `studentToken` environment variable for authorization.\n\n**Role:** Student\n\n**Path Parameter:**\n- `tokenId` *(required)* — The ID of the missed token to rejoin with (use `{{tokenId}}`)\n\n**Response includes:**\n- Updated token details\n- New queue position and estimated wait time"
+          },
+          "response": [
+            {
+              "name": "Rejoin Queue",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"tokenId\": \"{{tokenId}}\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/queue/rejoin",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "queue",
+                    "rejoin"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "5;w=60"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "5"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "4"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "60"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "96"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"60-2xpncYZ8nl2UXDsjPnE1AZwdFsE\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:18:15 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Only missed tokens can rejoin the queue. Current status: cancelled\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Missed History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/queue/missed-history`\n\nReturns a history of all tokens where the authenticated student was marked as missed. No request body is required — the student is identified from the Bearer token in the `Authorization` header. Use the `studentToken` environment variable for authorization.\n\n**Role:** Student\n\n**Response includes:**\n- Missed token ID and token number\n- Service name and date of the missed event\n- Reason for missed status (if available)"
+          },
+          "response": [
+            {
+              "name": "Missed History",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/queue/missed-history",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "queue",
+                    "missed-history"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "5;w=60"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "5"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "3"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "13"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "144"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"90-z0/8Tr44gPY1hTnfeQyY7tQnMEI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 05 Jun 2026 03:19:03 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Missed token history fetched\",\n    \"data\": {\n        \"missedTokens\": [],\n        \"pagination\": {\n            \"total\": 0,\n            \"page\": 1,\n            \"limit\": 10,\n            \"totalPages\": 0\n        }\n    }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Provides student-facing endpoints for interacting with the queue system. This folder covers the full token lifecycle from a student's perspective — booking a spot, tracking position, cancelling, and rejoining the queue.\n\n**Endpoints:**\n\n- **Book Token** — Books a new queue token for a student at a specific service.\n- **My Tokens** — Returns all active or recent tokens associated with the authenticated student.\n- **Cancel Token** — Cancels an existing token, removing the student from the queue.\n- **Token Status** — Retrieves the current status of a specific token (e.g., waiting, called, completed).\n- **My Queue Position** — Returns the student's current position in the queue for a given token.\n- **Rejoin Queue** — Allows a student to rejoin the queue after having been missed or skipped.\n- **Missed History** — Returns a history of tokens where the student was marked as missed.\n\n> These endpoints are intended for **student use only**. Use the `studentToken` environment variable for authorization when making requests to this folder.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{studentToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Queue-Staff",
+      "item": [
+        {
+          "name": "Init Queue",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "`POST {{baseUrl}}/api/queue/init/{{serviceId}}`\n\nInitializes the queue for a specific service at the start of the day or a new session. Used by **staff** to set up the queue before it begins accepting student tokens.\n\n**Request Body:**\n- `serviceId` — the ID of the service whose queue is being initialized\n- Session-specific configuration such as capacity or operating window (if applicable)\n\n**Response:** Confirms the queue has been set to an active state and is ready to accept tokens.\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Queue State",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/queue/state/{{serviceId}}`\n\nRetrieves the current operational state of the queue for a specific service. Used by **staff** to monitor whether the queue is active, paused, or closed.\n\n**Path/Query Parameters:**\n- `serviceId` — identifies the target queue\n\n**Response includes:**\n- Current queue status (`active`, `paused`, or `closed`)\n- Count of waiting tokens\n- Count of served tokens\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Queue Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/queue/overview`\n\nReturns a high-level summary of the queue for a specific service. Useful for **staff** to get a quick snapshot of queue progress at any point during the day.\n\n**Path/Query Parameters:**\n- `serviceId` — identifies the target queue\n\n**Response includes:**\n- Total tokens issued\n- Number of tokens served\n- Number of tokens waiting\n- Number of tokens missed\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Call Next",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "`PUT {{baseUrl}}/api/queue/next/{{serviceId}}`\n\nAdvances the queue by calling the next token in line for a specific service. Used by **staff** to signal that the next student should proceed.\n\n**Path/Query Parameters:**\n- `serviceId` — identifies the target queue\n\n**Response includes:**\n- Token number of the called token\n- Student information associated with the token\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Token",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "`PUT {{baseUrl}}/api/queue/complete/{{serviceId}}`\n\nMarks the currently active (called) token as completed and served. Used by **staff** after a student has been attended to, removing the token from the active queue and recording it in the service's processed history.\n\n**Path/Query Parameters:**\n- `tokenId` — identifies the token being completed\n\n**Response:** Confirms the token has been marked as served and logged in the session history.\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Skip Token",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "`PUT {{baseUrl}}/api/queue/skip/{{serviceId}}`\n\nSkips the current token, marking it as missed and advancing the queue to the next token in line. Used by **staff** when a student is absent or unresponsive when called.\n\n**Path/Query Parameters:**\n- `tokenId` — identifies the token to skip\n\n**Response:** Confirms the token has been marked as missed. The skipped student may be eligible to rejoin the queue depending on system configuration.\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Pause Queue",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "`PUT {{baseUrl}}/api/queue/pause/{{serviceId}}`\n\nPauses the queue for a specific service, temporarily halting token progression. Used by **staff** during breaks or when service is temporarily unavailable.\n\n**Path/Query Parameters:**\n- `serviceId` — identifies the target queue\n\n**Response:** Confirms the queue has been paused. While paused, no new tokens will be called and students will see the queue as temporarily on hold.\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Resume Queue",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "`PUT {{baseUrl}}/api/queue/resume/{{serviceId}}`\n\nResumes a previously paused queue, allowing token progression to continue. Used by **staff** when service is ready to resume after a break or interruption.\n\n**Path/Query Parameters:**\n- `serviceId` — identifies the target queue\n\n**Response:** Confirms the queue has returned to its active state and the next token can be called.\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        },
+        {
+          "name": "Missed Tokens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/queue/missed/{{serviceId}}`\n\nReturns a list of all tokens that were marked as missed during the current queue session. Used by **staff** to review which students did not respond when called.\n\n**Path/Query Parameters:**\n- `serviceId` — filters results to a specific service\n\n**Response includes (per missed token):**\n- Token ID\n- Student information\n- Timestamp of when the token was skipped\n\n> 🔐 Requires `staffToken` in the `Authorization` header."
+          },
+          "response": []
+        }
+      ],
+      "description": "Provides staff-facing controls for managing the queue lifecycle. This folder contains endpoints that allow staff members to initialize, monitor, and operate the queue — including calling the next token, handling missed or skipped tokens, and pausing or resuming the queue.\n\n**Endpoints:**\n\n- **Init Queue** — Initializes the queue for a service, setting it up for the day's operations.\n- **Queue State** — Retrieves the current state of the queue (e.g., active, paused, or closed).\n- **Queue Overview** — Returns a summary of the queue, including total tokens, served count, and pending count.\n- **Call Next** — Advances the queue by calling the next token in line.\n- **Complete Token** — Marks the currently active token as completed and served.\n- **Skip Token** — Skips the current token, moving it to a missed or skipped state.\n- **PUT Pause Queue** — Pauses the queue, temporarily halting token progression.\n- **PUT Resume Queue** — Resumes a paused queue, allowing token progression to continue.\n- **GET Missed Tokens** — Retrieves the list of tokens that were missed or skipped during the session.\n\n> These endpoints are intended for **staff use only**. Use the `staffToken` environment variable for authorization when making requests to this folder.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{staffToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student Dashboard",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/student/dashboard`\n\nReturns a personalized dashboard summary for the authenticated student. No request body is required — the student is identified from the Bearer token in the `Authorization` header. The response includes any currently active tokens, their queue positions, estimated wait times, and a summary of recent activity. Use the `studentToken` environment variable for authorization.\n\n**Details:**\n- **Role:** Student\n- **Auth:** Bearer token via `{{studentToken}}`\n- **Request Body:** None\n- **Response:** Active tokens, queue positions, estimated wait times, recent activity summary"
+          },
+          "response": []
+        },
+        {
+          "name": "Token History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/student/history`\n\nRetrieves the full token history for the authenticated student, including all past interactions with the queue system. No request body is required — the student is identified from the Bearer token in the `Authorization` header. The response includes a list of tokens with their service name, booking date, final status (e.g., `completed`, `cancelled`, `missed`), and relevant timestamps. Use the `studentToken` environment variable for authorization.\n\n**Details:**\n- **Role:** Student\n- **Auth:** Bearer token via `{{studentToken}}`\n- **Request Body:** None\n- **Response:** List of past tokens with service name, booking date, final status, and timestamps"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Token",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "`PUT {{baseUrl}}/api/student/cancel/{{tokenId}}`\n\nCancels an active token directly from the student dashboard. Provide the `tokenId` as a path or query parameter (or use the `{{tokenId}}` environment variable) to identify the token to cancel. Once cancelled, the student is removed from the queue and the token is marked as cancelled in their history. Use the `studentToken` environment variable for authorization.\n\n**Details:**\n- **Role:** Student\n- **Auth:** Bearer token via `{{studentToken}}`\n- **Input:** `tokenId` — the ID of the active token to cancel (use `{{tokenId}}`)\n- **Response:** Confirmation that the token has been cancelled and the student removed from the queue"
+          },
+          "response": []
+        }
+      ],
+      "description": "Provides students with a personalized view of their queue activity and token history. This folder contains endpoints that allow students to check their dashboard, review past tokens, and manage active bookings.\n\n**Endpoints:**\n\n- **GET Dashboard** — Returns a summary dashboard for the authenticated student, including any active tokens and current queue positions.\n- **GET Token History** — Retrieves the student's full history of past tokens, including completed, cancelled, and missed entries.\n- **PUT Cancel Token** — Cancels an active token directly from the dashboard, removing the student from the queue.\n\n> These endpoints are intended for **student use only**. Use the `studentToken` environment variable for authorization when making requests to this folder.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{studentToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff Dashboard",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/staff/dashboard`\n\nReturns a consolidated operational dashboard for the authenticated staff member. No request body is required — the staff member is identified from the Bearer token in the `Authorization` header. The response includes key metrics for the assigned service such as active queue size, tokens served today, and current queue status. Use the `staffToken` environment variable for authorization.\n\n**Auth:** Bearer `{{staffToken}}`\n\n**Response includes:**\n- Active queue size\n- Tokens served today\n- Current queue status"
+          },
+          "response": []
+        },
+        {
+          "name": "Active Queue List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/staff/queue/{{serviceId}}`\n\nRetrieves the list of tokens currently active and waiting in the queue for the staff member's assigned service. No request body is required — the staff member is identified from the Bearer token in the `Authorization` header. Use the `staffToken` environment variable for authorization.\n\n**Auth:** Bearer `{{staffToken}}`\n\n**Response includes (per token):**\n- Token number\n- Student name\n- Booking time\n- Current queue position"
+          },
+          "response": []
+        },
+        {
+          "name": "Today Processed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/staff/processed/{{serviceId}}`\n\nReturns the count and details of tokens that have been successfully processed (completed) during the current day's session. No request body is required — the staff member is identified from the Bearer token in the `Authorization` header. Use the `staffToken` environment variable for authorization.\n\n**Auth:** Bearer `{{staffToken}}`\n\n**Response includes (per token):**\n- Token ID\n- Student information\n- Service time\n- Completion timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Missed List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/staff/missed/{{serviceId}}`\n\nRetrieves the list of tokens that were missed or went unserved during the current session. No request body is required — the staff member is identified from the Bearer token in the `Authorization` header. Staff can use this list to follow up with missed students or allow them to rejoin the queue. Use the `staffToken` environment variable for authorization.\n\n**Auth:** Bearer `{{staffToken}}`\n\n**Response includes (per token):**\n- Token ID\n- Student information\n- Time the token was skipped"
+          },
+          "response": []
+        }
+      ],
+      "description": "Provides staff members with a high-level overview of daily queue operations. This folder contains endpoints that surface real-time and end-of-day summaries, helping staff monitor active queues and track service outcomes.\n\n**Endpoints:**\n\n- **GET Dashboard** — Returns a consolidated dashboard view with key metrics for the staff member's assigned service, including active tokens and queue status.\n- **GET Active Queue List** — Retrieves the list of tokens currently active and waiting in the queue.\n- **GET Today Processed** — Returns the count and details of tokens that have been successfully processed today.\n- **GET Missed List** — Retrieves the list of tokens that were missed or went unserved during the current session.\n\n> These endpoints are intended for **staff use only**. Use the `staffToken` environment variable for authorization when making requests to this folder.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{staffToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Office Comparison",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/analytics/office-comparison`\n\nCompares queue performance metrics across different office locations or service counters. Intended for **administrators and staff**. Optional query parameters may be used to filter by date range or specific service IDs. The response includes side-by-side metrics such as total tokens served, average wait time, and missed token rate per office.\n\n**Authorization:** Use the `staffToken` or `adminToken` environment variable as the Bearer token.\n\n**Query Parameters:**\n- `startDate` *(optional)* — Filter results from this date\n- `endDate` *(optional)* — Filter results up to this date\n- `serviceId` *(optional)* — Limit comparison to a specific service"
+          },
+          "response": []
+        },
+        {
+          "name": "Wait Time",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/analytics/wait-time`\n\nReturns average or historical wait time data for a given service or time period. Intended for **staff and administrators** monitoring service efficiency. Provide the `serviceId` and optional date range query parameters to filter the results. The response includes average wait time, minimum and maximum wait times, and trend data over the specified period.\n\n**Authorization:** Use the `staffToken` or `adminToken` environment variable as the Bearer token.\n\n**Query Parameters:**\n- `serviceId` *(required)* — The ID of the service to query\n- `startDate` *(optional)* — Start of the date range\n- `endDate` *(optional)* — End of the date range"
+          },
+          "response": []
+        },
+        {
+          "name": "Daily",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/analytics/daily`\n\nProvides a daily breakdown of queue activity for a specific service. Intended for **staff and administrators** reviewing day-level performance. Provide the `serviceId` and optionally a `date` query parameter to target a specific day (defaults to today). The response includes total tokens issued, tokens served, tokens missed, and average wait time for that day.\n\n**Authorization:** Use the `staffToken` or `adminToken` environment variable as the Bearer token.\n\n**Query Parameters:**\n- `serviceId` *(required)* — The ID of the service to query\n- `date` *(optional)* — Target date in `YYYY-MM-DD` format (defaults to today)"
+          },
+          "response": []
+        },
+        {
+          "name": "Peak Hours",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/analytics/peak-hours`\n\nIdentifies the busiest hours of operation for a specific service based on historical token data. Intended for **staff and administrators** planning staffing levels and capacity. Provide the `serviceId` and an optional date range to scope the analysis. The response includes an hourly breakdown of token volume, helping teams optimize resource allocation.\n\n**Authorization:** Use the `staffToken` or `adminToken` environment variable as the Bearer token.\n\n**Query Parameters:**\n- `serviceId` *(required)* — The ID of the service to analyze\n- `startDate` *(optional)* — Start of the analysis window\n- `endDate` *(optional)* — End of the analysis window"
+          },
+          "response": []
+        },
+        {
+          "name": "Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/analytics/range`\n\nRetrieves aggregated analytics data for a specified date range. Intended for **staff and administrators** generating period-based reports. Provide the `serviceId`, `startDate`, and `endDate` as query parameters to define the reporting window. The response includes totals and averages for tokens served, wait times, and missed tokens across the selected period.\n\n**Authorization:** Use the `staffToken` or `adminToken` environment variable as the Bearer token.\n\n**Query Parameters:**\n- `serviceId` *(required)* — The ID of the service to report on\n- `startDate` *(required)* — Start of the reporting window in `YYYY-MM-DD` format\n- `endDate` *(required)* — End of the reporting window in `YYYY-MM-DD` format"
+          },
+          "response": []
+        },
+        {
+          "name": "Most Crowded",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/analytics/most-crowded`\n\nReturns information about the most congested services or time slots based on historical queue data. Intended for **staff and administrators** identifying bottlenecks and high-demand periods. Optional query parameters can be used to filter by date range or service. The response highlights the services and time windows with the highest token volumes and longest wait times.\n\n**Authorization:** Use the `staffToken` or `adminToken` environment variable as the Bearer token.\n\n**Query Parameters:**\n- `serviceId` *(optional)* — Limit results to a specific service\n- `startDate` *(optional)* — Filter from this date\n- `endDate` *(optional)* — Filter up to this date"
+          },
+          "response": []
+        },
+        {
+          "name": "Student Insights",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "`GET {{baseUrl}}/api/analytics/student-insights`\n\nProvides student-specific analytics such as visit frequency, average wait times, and missed token rates. Intended for **administrators and staff** seeking to understand student usage patterns and improve service delivery. Provide the `serviceId` and optional filters such as date range or student ID. The response includes aggregated behavioral data useful for identifying trends and optimizing queue management for student users.\n\n**Authorization:** Use the `staffToken` or `adminToken` environment variable as the Bearer token.\n\n**Query Parameters:**\n\n- `serviceId` _(required)_ — The ID of the service to analyze\n    \n- `studentId` _(optional)_ — Filter results for a specific student\n    \n- `startDate` _(optional)_ — Start of the date range\n    \n- `endDate` _(optional)_ — End of the date range"
+          },
+          "response": []
+        }
+      ],
+      "description": "Exposes reporting and analytics endpoints for understanding queue performance and usage patterns. This folder is primarily used by administrators and staff to gain insights into service efficiency, student behavior, and peak demand periods.\n\n**Endpoints:**\n\n- **GET Office Comparison** — Compares queue performance metrics across different office locations or service counters.\n- **GET Wait Time** — Returns average or historical wait time data for a given service or time period.\n- **GET Daily** — Provides a daily breakdown of queue activity, including token counts and service rates.\n- **GET Peak Hours** — Identifies the busiest hours of operation based on historical token data.\n- **GET Date Range** — Retrieves aggregated analytics data for a specified date range.\n- **GET Most Crowded** — Returns information about the most congested services or time slots.\n- **GET Student Insights** — Provides student-specific analytics such as visit frequency and average wait times.\n\n> These endpoints are typically used by **staff and administrators**. Use the `staffToken` or `adminToken` environment variable for authorization.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
